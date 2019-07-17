@@ -31,3 +31,18 @@
    B拿到A对象后顺利完成了初始化阶段1、2、3，完全初始化之后将自己放入到一级缓存singletonObjects中。此时返回A中，A此时能拿到B的对象顺利完成自己的初始化阶段2、3，最终A也完成了初始化，进去了一级缓存singletonObjects中，而且更加幸运的是，由于B拿到了A的对象引用，所以B现在hold住的A对象完成了初始化。
    
    知道了这个原理时候，肯定就知道为啥Spring不能解决“A的构造方法中依赖了B的实例对象，同时B的构造方法中依赖了A的实例对象”这类问题了！因为加入singletonFactories三级缓存的前提是执行了构造器，所以构造器的循环依赖没法解决。
+
+#### SpringMVC
+1. SpringMVC的整个处理流程
+   
+   1. 用户发送请求至前端控制器DispatcherServlet
+   2. DispatcherServlet收到请求调用HandlerMapping处理器映射器。
+   3. 处理器映射器根据请求url找到具体的处理器，生成处理器对象及处理器拦截器(如果有则生成)一并返回给DispatcherServlet。
+   4. DispatcherServlet通过HandlerAdapter处理器适配器调用处理器
+   5. 执行处理器(Controller，也叫后端控制器)。
+   6. Controller执行完成返回ModelAndView
+   7. HandlerAdapter将controller执行结果ModelAndView返回给DispatcherServlet
+   8. DispatcherServlet将ModelAndView传给ViewReslover视图解析器
+   9. ViewReslover解析后返回具体View
+   10. DispatcherServlet对View进行渲染视图（即将模型数据填充至视图中）。
+   11. DispatcherServlet响应用户
