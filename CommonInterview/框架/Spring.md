@@ -46,3 +46,14 @@
    9. ViewReslover解析后返回具体View
    10. DispatcherServlet对View进行渲染视图（即将模型数据填充至视图中）。
    11. DispatcherServlet响应用户
+
+#### Spring问题
+1. Spring AOP中自我调用的问题
+   这里先说一下AOP拦截不到自我调用方法的原因：假设我们有一个类是ServiceA，这个类中有一个A方法，A方法中又调用了B方法。
+   当我们使用AOP进行拦截的时候，首先会创建一个ServiceA的代理类，其实在我们的系统中是存在两个ServiceA的对象的，一个是目标ServiceA对象，一个是生成的代理ServiceA对象，如果在代理类的A方法中调用代理类的B方法，这个时候AOP拦截是可以生效的，
+   但是如果在代理类的A方法中调用目标类的B方法，这个时候AOP拦截是不生效的，大多数情况下我们都是在代理类的A方法中直接调用目标类的B方法。
+   首先调用的是AOP代理对象而不是目标对象，首先执行事务切面，事务切面内部通过TransactionInterceptor环绕增强进行事务的增强，即进入目标方法之前开启事务，退出目标方法时提交/回滚事务。目标对象内部的自我调用将无法实施切面中的增强。 此处的this指向目标对象，因此调用this.b()将不会执行b事务切面，即不会执行事务增强，因此b方法的事务定义“@Transactional(propagation = Propagation.REQUIRES_NEW)”将不会实施
+ 
+2. Spring的事务传播行为
+   
+   [事务传播](https://segmentfault.com/a/1190000013341344?utm_source=tag-newest)  
